@@ -14,6 +14,25 @@ struct AppReplaceOption : Hashable {
     var appToReplace: LCAppModel?
 }
 
+class LCUtils {
+    static let appGroupUserDefault = UserDefaults.standard
+
+    /// Renames the iOS app from `.tipa` to `.ipa` if needed, and returns the corrected URL.
+    static func ensureIpaExtension(for url: URL) -> URL {
+        if url.pathExtension.lowercased() == "tipa" {
+            let correctedURL = url.deletingPathExtension().appendingPathExtension("ipa")
+            do {
+                try FileManager.default.moveItem(at: url, to: correctedURL)
+                return correctedURL
+            } catch {
+                print("❌ Failed to rename .tipa to .ipa: \(error.localizedDescription)")
+                return url
+            }
+        }
+        return url
+    }
+}
+
 struct LCAppListView : View, LCAppBannerDelegate, LCAppModelDelegate {
     
     @Binding var appDataFolderNames: [String]
